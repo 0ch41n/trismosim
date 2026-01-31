@@ -158,9 +158,16 @@
             installButton.style.display = 'none';
         });
         
-        // Check if app is already installed
-        if (window.matchMedia('(display-mode: standalone)').matches) {
+        // Check if app is running in standalone mode
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
             statusDiv.textContent = 'Ejecutando en modo aplicación';
+        } else if (!deferredPrompt) {
+            // Only show message if not in standalone and no install prompt available
+            setTimeout(() => {
+                if (!deferredPrompt && installButton.style.display !== 'inline-block') {
+                    statusDiv.textContent = '';
+                }
+            }, 1000);
         }
     </script>
 </body>

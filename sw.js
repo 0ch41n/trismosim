@@ -2,9 +2,7 @@ const CACHE_NAME = 'trismosim-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/manifest.json'
 ];
 
 // Install event - cache resources
@@ -13,7 +11,16 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Cache abierto');
-        return cache.addAll(urlsToCache.filter(url => url !== '/icons/icon-192x192.png' && url !== '/icons/icon-512x512.png'));
+        // Cache core files first
+        return cache.addAll(urlsToCache).then(() => {
+          // Try to cache icons, but don't fail if they're not available
+          return cache.addAll([
+            '/icons/icon-192x192.png',
+            '/icons/icon-512x512.png'
+          ]).catch(() => {
+            console.log('Icons not cached, will be cached on first request');
+          });
+        });
       })
       .catch((error) => {
         console.log('Error al cachear recursos:', error);
